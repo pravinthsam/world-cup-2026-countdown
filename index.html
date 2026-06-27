@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FIFA World Cup 2026 Countdown</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Track upcoming FIFA World Cup 2026 matches with real-time countdown timers, converted to your preferred timezone. Displaying teams, venues, and flags.">
+  
+  <!-- Google Fonts: Outfit for headings, Inter for body -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="background-decorations">
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+  </div>
+
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo-area">
+        <div class="trophy-badge">
+          <i data-lucide="trophy"></i>
+        </div>
+        <div class="title-meta">
+          <h1>FIFA World Cup 2026</h1>
+          <p class="subtitle">Match Countdown & Schedule</p>
+        </div>
+      </div>
+      
+      <div class="timezone-picker-container">
+        <label for="timezone-select">
+          <i data-lucide="globe"></i>
+          <span>Timezone:</span>
+        </label>
+        <div class="select-wrapper">
+          <select id="timezone-select">
+            <option value="local">Detecting Local Time...</option>
+            <!-- Curated timezones will be populated here -->
+          </select>
+          <i data-lucide="chevron-down" class="select-arrow"></i>
+        </div>
+        <button id="reload-btn" class="reload-button" title="Reload Match Data">
+          <i data-lucide="refresh-cw"></i>
+        </button>
+      </div>
+    </div>
+    
+    <!-- Tab Navigation Bar -->
+    <div class="header-nav-wrapper">
+      <nav class="app-nav">
+        <button class="nav-tab active" data-tab="upcoming">
+          <i data-lucide="calendar-days"></i>
+          <span>Upcoming Matches</span>
+        </button>
+        <button class="nav-tab" data-tab="results">
+          <i data-lucide="award"></i>
+          <span>Match Results</span>
+        </button>
+        <button class="nav-tab" data-tab="standings">
+          <i data-lucide="table"></i>
+          <span>Points Table</span>
+        </button>
+        <button class="nav-tab" data-tab="scorers">
+          <i data-lucide="sport-shoe"></i>
+          <span>Golden Boot</span>
+        </button>
+        <button class="nav-tab" data-tab="bracket">
+          <i data-lucide="git-branch"></i>
+          <span>Knockout Bracket</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content">
+    <div class="dashboard-meta">
+      <div class="meta-item">
+        <i data-lucide="calendar-days"></i>
+        <span id="matches-count-label">Loading matches...</span>
+      </div>
+      <div class="meta-item">
+        <i data-lucide="clock"></i>
+        <span id="current-time-label">Current Time: --:--:--</span>
+      </div>
+    </div>
+
+    <!-- Tab View: Upcoming Matches -->
+    <div id="upcoming-view" class="tab-view active">
+      <section class="matches-section">
+        <div id="matches-loader" class="loader-container">
+          <div class="spinner"></div>
+          <p>Loading tournament schedule...</p>
+        </div>
+        <div id="matches-grid" class="matches-grid hidden">
+          <!-- populated by JavaScript -->
+        </div>
+        <div id="no-matches-message" class="no-matches-container hidden">
+          <i data-lucide="calendar-x" class="empty-icon"></i>
+          <h3>No Upcoming Matches</h3>
+          <p>All scheduled matches in the database have already concluded.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Tab View: Match Results -->
+    <div id="results-view" class="tab-view hidden">
+      
+      <div id="results-list" class="results-list">
+        <!-- populated by JavaScript -->
+      </div>
+      <div id="no-results-message" class="no-matches-container hidden">
+        <i data-lucide="calendar-x" class="empty-icon"></i>
+        <h3>No Results Found</h3>
+        <p>No matches matching your search criteria have concluded.</p>
+      </div>
+    </div>
+
+    <!-- Tab View: Standings / Points Table -->
+    <div id="standings-view" class="tab-view hidden">
+      
+      <div id="standings-grid" class="standings-grid">
+        <!-- populated by JavaScript -->
+      </div>
+    </div>
+
+    <!-- Tab View: Golden Boot / Top Scorers -->
+    <div id="scorers-view" class="tab-view hidden">
+      
+      <!-- Podium (Top 3) -->
+      <div id="scorers-podium" class="scorers-podium">
+        <!-- populated by JavaScript -->
+      </div>
+      
+      <!-- Leaderboard (Rank 4+) -->
+      <div class="scorers-leaderboard-container">
+        <table class="standings-table scorers-table">
+          <thead>
+            <tr>
+              <th style="width: 10%;">Rank</th>
+              <th class="align-left" style="width: 50%;">Player</th>
+              <th class="align-left" style="width: 25%;">Team</th>
+              <th class="pts-header" style="width: 15%;">Goals</th>
+            </tr>
+          </thead>
+          <tbody id="scorers-list">
+            <!-- populated by JavaScript -->
+          </tbody>
+        </table>
+      </div>
+      <div id="no-scorers-message" class="no-matches-container hidden">
+        <i data-lucide="star-off" class="empty-icon"></i>
+        <h3>No Scorers Found</h3>
+        <p>No players match your search criteria.</p>
+      </div>
+    </div>
+
+    <!-- Tab View: Knockout Bracket -->
+    <div id="bracket-view" class="tab-view hidden">
+      <div class="bracket-controls">
+        <div class="round-shortcuts">
+          <button class="round-btn" data-round="round-32">Round of 32</button>
+          <button class="round-btn" data-round="round-16">Round of 16</button>
+          <button class="round-btn" data-round="quarter-finals">Quarter-finals</button>
+          <button class="round-btn" data-round="semi-finals">Semi-finals</button>
+          <button class="round-btn" data-round="finals">Finals</button>
+        </div>
+        <div class="zoom-controls">
+          <button id="zoom-out-btn" class="control-btn" title="Zoom Out">
+            <i data-lucide="zoom-out"></i>
+          </button>
+          <button id="zoom-reset-btn" class="control-btn" title="Reset Zoom">100%</button>
+          <button id="zoom-in-btn" class="control-btn" title="Zoom In">
+            <i data-lucide="zoom-in"></i>
+          </button>
+        </div>
+      </div>
+      <div class="bracket-outer-container">
+        <div class="bracket-wrapper" id="bracket-scroller">
+          <div class="bracket-tree" id="bracket-tree-container">
+            <!-- populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="app-footer">
+    <p>FIFA World Cup 2026 Countdown &bull; Styled with modern glassmorphism</p>
+  </footer>
+
+  <!-- Core Javascript File -->
+  <script src="app.js"></script>
+</body>
+</html>
