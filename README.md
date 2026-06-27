@@ -28,7 +28,7 @@ A premium, interactive single-page web application featuring live countdowns, ma
 
 ## 🚀 Running Locally (Optional)
 
-While the default way to access the hub is via the [live page](https://pravinthsam.github.io/world-cup-2026-countdown/), you can optionally run it locally. Because the application fetches live JSON data and provides a local fallback, you should run it using a local development server to avoid CORS/Fetch errors when loading files in the browser.
+While the default way to access the hub is via the [live page](https://pravinthsam.github.io/world-cup-2026-countdown/), you can optionally run it locally. Because the application fetches remote JSON data, you should run it using a local development server to avoid CORS/Fetch errors when loading files in the browser.
 
 Here are a few quick ways to spin up a local server in the repository directory:
 
@@ -53,10 +53,10 @@ npx http-server
 
 ## 💾 Data Source Credit
 
-All tournament schedule, results, and scorer data are retrieved from:
+All tournament schedule, results, and scorer data are retrieved directly from:
 * **Repository**: [openfootball/worldcup.json](https://github.com/openfootball/worldcup.json) on GitHub.
 
-The application attempts to fetch live data from the remote repository's main branch first. If the remote request fails or the user is offline, it gracefully falls back to the locally cached `worldcup.json` file.
+The application fetches this live data from the remote repository's main branch. In case of network errors, it retries up to 3 times with exponential backoff before displaying a failure screen with a "Try Again" button.
 
 ---
 

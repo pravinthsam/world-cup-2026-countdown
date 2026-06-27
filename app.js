@@ -125,50 +125,54 @@ function setupTimezoneDropdown() {
   });
 }
 
-// Fetch matches from live GitHub repo only
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+// Fetch matches from live GitHub repo only (with retries and exponential backoff)
 async function fetchMatches() {
   const loader = document.getElementById('matches-loader');
   const grid = document.getElementById('matches-grid');
   
   const isInitial = matchesData.length === 0;
-  if (isInitial && loader) {
-    loader.classList.remove('hidden');
-    grid.classList.add('hidden');
-  }
   
+  const maxAttempts = 3;
   let dataFetched = false;
   let fetchedData = null;
   let fetchError = null;
-  
-  // Pull live data from openfootball GitHub raw URL with local fallback and 2-second timeout
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 2000);
-  
-  try {
-    const response = await fetch('https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json', { signal: controller.signal });
-    clearTimeout(timeoutId);
-    if (response.ok) {
-      fetchedData = await response.json();
-      dataFetched = true;
-      console.log("Successfully fetched live data from GitHub.");
-    } else {
-      throw new Error(`Failed to load live data (Status: ${response.status})`);
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    if (isInitial && loader) {
+      loader.classList.remove('hidden');
+      grid.classList.add('hidden');
+      loader.innerHTML = `
+        <div class="spinner"></div>
+        <p>Loading tournament schedule... ${attempt > 1 ? `(Attempt ${attempt}/${maxAttempts})` : ''}</p>
+      `;
     }
-  } catch (error) {
-    clearTimeout(timeoutId);
-    console.warn("Failed to fetch live data from GitHub, trying local fallback...", error);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3-second timeout per attempt
+
     try {
-      const localResponse = await fetch('worldcup.json');
-      if (localResponse.ok) {
-        fetchedData = await localResponse.json();
+      const response = await fetch('https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json', { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (response.ok) {
+        fetchedData = await response.json();
         dataFetched = true;
-        console.log("Successfully fetched local match data.");
+        console.log(`Successfully fetched live data from GitHub on attempt ${attempt}.`);
+        break;
       } else {
-        throw new Error(`Failed to load local data (Status: ${localResponse.status})`);
+        throw new Error(`Failed to load live data (Status: ${response.status})`);
       }
-    } catch (localError) {
-      console.error("Local fallback also failed:", localError);
-      fetchError = localError;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      console.warn(`Attempt ${attempt}/${maxAttempts} failed:`, error);
+      fetchError = error;
+      
+      if (attempt < maxAttempts) {
+        const backoffMs = Math.pow(2, attempt - 1) * 1000; // 1000ms, then 2000ms
+        console.log(`Waiting ${backoffMs}ms before next attempt...`);
+        await sleep(backoffMs);
+      }
     }
   }
   
@@ -202,9 +206,17 @@ async function fetchMatches() {
       loader.innerHTML = `
         <i data-lucide="alert-triangle" style="width: 48px; height: 48px; color: var(--accent-red)"></i>
         <h3 style="margin-top: 1rem;">Failed to load schedule</h3>
-        <p style="color: var(--text-muted); text-align: center;">${fetchError ? fetchError.message : 'Unknown error'}</p>
+        <p style="color: var(--text-muted); text-align: center; margin-bottom: 1rem;">${fetchError ? fetchError.message : 'Unknown error'}</p>
+        <button id="retry-fetch-btn" class="retry-button">
+          <i data-lucide="refresh-cw" style="width: 16px; height: 16px;"></i>
+          <span>Try Again</span>
+        </button>
       `;
       lucide.createIcons();
+      const retryBtn = document.getElementById('retry-fetch-btn');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', () => fetchMatches());
+      }
     }
   }
 }

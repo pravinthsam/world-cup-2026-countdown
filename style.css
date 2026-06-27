@@ -2002,3 +2002,34 @@ body {
   display: none !important;
 }
 
+/* Retry Button Styling */
+.retry-button {
+  background: hsla(224, 71%, 10%, 0.5);
+  border: 1px solid var(--border-color);
+  color: var(--text-light);
+  height: 38px;
+  padding: 0 1.5rem;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  margin-top: 1rem;
+}
+
+.retry-button:hover {
+  background: hsla(224, 71%, 15%, 0.7);
+  border-color: var(--border-hover);
+  color: var(--text-white);
+  transform: scale(1.05);
+}
+
+.retry-button i, .retry-button svg {
+  transition: transform 0.5s ease;
+}
+
+.retry-button:active i, .retry-button:active svg {
+  transform: rotate(180deg);
+}
