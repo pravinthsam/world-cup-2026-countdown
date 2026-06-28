@@ -1589,7 +1589,7 @@ function renderBracket() {
     } else {
       subtitle = `Champions & 3rd Place`;
     }
-    col.innerHTML = `<div class="bracket-round-header"><h3>${colSpec.name}</h3><span>${subtitle}</span></div>`;
+    col.innerHTML = `<div class="bracket-round-header"><h3>${colSpec.name} <span class="bracket-round-subtitle">(${subtitle})</span></h3></div>`;
     
     // Matches
     if (colSpec.type === 'pairs') {
@@ -1629,6 +1629,7 @@ function renderBracket() {
       finalWrapper.className = 'bracket-match';
       finalWrapper.innerHTML = createMatchCardHtml(colSpec.matches[0], 'Final');
       pairContainer.appendChild(finalWrapper);
+      col.appendChild(pairContainer);
       
       const thirdPlacePlayoff = document.createElement('div');
       thirdPlacePlayoff.className = 'third-place-container';
@@ -1639,8 +1640,7 @@ function renderBracket() {
       tpWrapper.innerHTML = createMatchCardHtml(colSpec.matches[1], '3rd Place');
       thirdPlacePlayoff.appendChild(tpWrapper);
       
-      pairContainer.appendChild(thirdPlacePlayoff);
-      col.appendChild(pairContainer);
+      col.appendChild(thirdPlacePlayoff);
     }
     
     container.appendChild(col);
@@ -1763,33 +1763,6 @@ function setupBracketControls() {
       updateZoom();
     });
   }
-  
-  // Round navigation shortcut buttons
-  const roundBtns = document.querySelectorAll('.round-btn');
-  roundBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const roundId = btn.getAttribute('data-round');
-      
-      let targetColumnId = roundId;
-      if (roundId === 'round-32') targetColumnId = 'left-r32';
-      if (roundId === 'round-16') targetColumnId = 'left-r16';
-      if (roundId === 'quarter-finals') targetColumnId = 'left-qf';
-      if (roundId === 'semi-finals') targetColumnId = 'left-sf';
-      if (roundId === 'finals') targetColumnId = 'center-finals';
-      
-      const roundCol = document.querySelector(`.bracket-round[data-round-id="${targetColumnId}"]`);
-      if (roundCol && scroller) {
-        roundBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        
-        const colLeft = roundCol.offsetLeft;
-        const colWidth = roundCol.offsetWidth;
-        const scrollerWidth = scroller.offsetWidth;
-        
-        scroller.scrollLeft = colLeft - (scrollerWidth / 2) + (colWidth / 2);
-      }
-    });
-  });
 }
 
 // Hover event listeners for path tracing
@@ -1797,16 +1770,26 @@ function setupBracketHighlighting() {
   const container = document.getElementById('bracket-tree-container');
   if (!container) return;
   
-  container.addEventListener('mouseenter', (e) => {
+  container.addEventListener('mouseover', (e) => {
     const card = e.target.closest('.bracket-card');
     if (!card) return;
+    
+    // Performance and flickering optimization: Only highlight if entering a new card from outside it
+    const relatedCard = e.relatedTarget ? e.relatedTarget.closest('.bracket-card') : null;
+    if (card === relatedCard) return;
+    
     const matchNum = parseInt(card.getAttribute('data-match-num'), 10);
     highlightPath(matchNum, true);
   }, true);
   
-  container.addEventListener('mouseleave', (e) => {
+  container.addEventListener('mouseout', (e) => {
     const card = e.target.closest('.bracket-card');
     if (!card) return;
+    
+    // Performance and flickering optimization: Only remove highlight if leaving the card entirely
+    const relatedCard = e.relatedTarget ? e.relatedTarget.closest('.bracket-card') : null;
+    if (card === relatedCard) return;
+    
     const matchNum = parseInt(card.getAttribute('data-match-num'), 10);
     highlightPath(matchNum, false);
   }, true);

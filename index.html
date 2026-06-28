@@ -167,14 +167,7 @@
 
     <!-- Tab View: Knockout Bracket -->
     <div id="bracket-view" class="tab-view hidden">
-      <div class="bracket-controls">
-        <div class="round-shortcuts">
-          <button class="round-btn" data-round="round-32">Round of 32</button>
-          <button class="round-btn" data-round="round-16">Round of 16</button>
-          <button class="round-btn" data-round="quarter-finals">Quarter-finals</button>
-          <button class="round-btn" data-round="semi-finals">Semi-finals</button>
-          <button class="round-btn" data-round="finals">Finals</button>
-        </div>
+      <div class="bracket-outer-container">
         <div class="zoom-controls">
           <button id="zoom-out-btn" class="control-btn" title="Zoom Out">
             <i data-lucide="zoom-out"></i>
@@ -184,8 +177,6 @@
             <i data-lucide="zoom-in"></i>
           </button>
         </div>
-      </div>
-      <div class="bracket-outer-container">
         <div class="bracket-wrapper" id="bracket-scroller">
           <div class="bracket-tree" id="bracket-tree-container">
             <!-- populated by JavaScript -->

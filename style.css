@@ -1469,54 +1469,21 @@ body {
    KNOCKOUT BRACKET SECTION STYLES
    ========================================== */
 
-/* Tab View: Bracket Controls */
-.bracket-controls {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  background: var(--bg-card);
-  backdrop-filter: var(--card-blur);
-  border: 1px solid var(--border-color);
-  padding: 0.75rem 1.25rem;
-  border-radius: 12px;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.round-shortcuts {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.round-btn {
-  background: hsla(224, 71%, 10%, 0.4);
-  border: 1px solid var(--border-color);
-  color: var(--text-gray);
-  padding: 0.5rem 0.9rem;
-  border-radius: 8px;
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: var(--transition-smooth);
-}
-
-.round-btn:hover, .round-btn.active {
-  background: hsla(224, 71%, 15%, 0.8);
-  border-color: var(--accent-green);
-  color: var(--text-white);
-}
-
+/* Zoom controls - Floating Overlay inside container */
 .zoom-controls {
   display: flex;
   align-items: center;
-  background: hsla(224, 71%, 5%, 0.6);
+  background: hsla(224, 71%, 4%, 0.85);
   border: 1px solid var(--border-color);
   border-radius: 8px;
   padding: 0.2rem;
   gap: 0.25rem;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 20;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: var(--transition-smooth);
 }
 
 .zoom-controls .control-btn {
@@ -1597,7 +1564,7 @@ body {
 
 .bracket-tree {
   display: flex;
-  gap: 3.5rem; /* Gap between columns */
+  gap: 2rem; /* Gap between columns */
   position: relative;
   width: max-content;
   transform-origin: top left;
@@ -1610,15 +1577,15 @@ body {
   justify-content: space-around;
   width: 200px;
   flex-shrink: 0;
-  gap: 2.5rem;
+  gap: 1.25rem;
   position: relative;
 }
 
 .bracket-round-header {
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.4rem;
   border-bottom: 2px solid var(--border-color);
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.2rem;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -1628,19 +1595,27 @@ body {
 
 .bracket-round-header h3 {
   font-family: var(--font-heading);
-  font-size: 1.1rem;
+  font-size: 0.82rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   background: linear-gradient(135deg, var(--accent-gold), var(--text-white));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  flex-wrap: wrap;
 }
 
-.bracket-round-header span {
-  font-size: 0.75rem;
+.bracket-round-header span.bracket-round-subtitle {
+  font-size: 0.65rem;
   color: var(--text-muted);
-  font-weight: 600;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  -webkit-text-fill-color: var(--text-muted);
 }
 
 /* Bracket Match Pairings */
@@ -1650,13 +1625,13 @@ body {
   justify-content: space-around;
   position: relative;
   height: 100%;
-  gap: 1.5rem;
+  gap: 0.75rem;
 }
 
 /* Connection Lines */
 .bracket-match {
   position: relative;
-  padding: 0.75rem 0;
+  padding: 0.25rem 0;
   width: 100%;
 }
 
@@ -1671,9 +1646,9 @@ body {
 .bracket-round.left-side:not(.first-round) .bracket-match::before {
   content: '';
   position: absolute;
-  left: -1.75rem;
+  left: -1.0rem;
   top: 50%;
-  width: 1.75rem;
+  width: 1.0rem;
   height: 2px;
   background-color: var(--bracket-line-color);
   transition: var(--transition-smooth);
@@ -1682,9 +1657,9 @@ body {
 .bracket-round.left-side .bracket-match::after {
   content: '';
   position: absolute;
-  right: -1.75rem;
+  right: -1.0rem;
   top: 50%;
-  width: 1.75rem;
+  width: 1.0rem;
   height: 2px;
   background-color: var(--bracket-line-color);
   transition: var(--transition-smooth);
@@ -1693,7 +1668,7 @@ body {
 .bracket-round.left-side:not(.last-round) .bracket-match-pair::after {
   content: '';
   position: absolute;
-  right: -1.75rem;
+  right: -1.0rem;
   top: 25%;
   height: 50%;
   width: 2px;
@@ -1705,9 +1680,9 @@ body {
 .bracket-round.right-side:not(.first-round) .bracket-match::before {
   content: '';
   position: absolute;
-  right: -1.75rem;
+  right: -1.0rem;
   top: 50%;
-  width: 1.75rem;
+  width: 1.0rem;
   height: 2px;
   background-color: var(--bracket-line-color);
   transition: var(--transition-smooth);
@@ -1716,9 +1691,9 @@ body {
 .bracket-round.right-side .bracket-match::after {
   content: '';
   position: absolute;
-  left: -1.75rem;
+  left: -1.0rem;
   top: 50%;
-  width: 1.75rem;
+  width: 1.0rem;
   height: 2px;
   background-color: var(--bracket-line-color);
   transition: var(--transition-smooth);
@@ -1727,7 +1702,7 @@ body {
 .bracket-round.right-side:not(.last-round) .bracket-match-pair::after {
   content: '';
   position: absolute;
-  left: -1.75rem;
+  left: -1.0rem;
   top: 25%;
   height: 50%;
   width: 2px;
@@ -1739,9 +1714,9 @@ body {
 .bracket-round.center-side .bracket-match::before {
   content: '';
   position: absolute;
-  left: -1.75rem;
+  left: -1.0rem;
   top: 50%;
-  width: 1.75rem;
+  width: 1.0rem;
   height: 2px;
   background-color: var(--bracket-line-color);
   transition: var(--transition-smooth);
@@ -1750,9 +1725,9 @@ body {
 .bracket-round.center-side .bracket-match::after {
   content: '';
   position: absolute;
-  right: -1.75rem;
+  right: -1.0rem;
   top: 50%;
-  width: 1.75rem;
+  width: 1.0rem;
   height: 2px;
   background-color: var(--bracket-line-color);
   transition: var(--transition-smooth);
@@ -1782,7 +1757,7 @@ body {
   backdrop-filter: var(--card-blur);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  padding: 0.8rem;
+  padding: 0.5rem 0.6rem;
   box-shadow: var(--shadow-sm);
   transition: var(--transition-smooth);
   width: 100%;
@@ -1811,12 +1786,12 @@ body {
 .bracket-card-header {
   display: flex;
   justify-content: space-between;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 600;
   color: var(--text-muted);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.3rem;
   border-bottom: 1px solid hsla(224, 50%, 25%, 0.15);
-  padding-bottom: 0.3rem;
+  padding-bottom: 0.15rem;
   text-transform: uppercase;
 }
 
@@ -1828,7 +1803,7 @@ body {
 .bracket-card-teams {
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.25rem;
 }
 
 .bracket-team-row {
@@ -1836,7 +1811,7 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.2rem 0;
+  padding: 0.1rem 0;
   position: relative;
 }
 
@@ -1955,6 +1930,26 @@ body {
   position: relative;
 }
 
+.center-side .third-place-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin-top: 0;
+  border-top: 1px dashed var(--border-color);
+  padding-top: 0.5rem;
+  z-index: 10;
+}
+
+.third-place-container .bracket-match {
+  padding: 0.25rem 0;
+}
+
+.third-place-container .bracket-match::before,
+.third-place-container .bracket-match::after {
+  content: none !important;
+}
+
 .third-place-title {
   font-size: 0.75rem;
   font-weight: 700;
@@ -1965,21 +1960,7 @@ body {
   text-align: center;
 }
 
-/* Responsive Overrides */
-@media (max-width: 768px) {
-  .bracket-controls {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  
-  .round-shortcuts {
-    justify-content: center;
-  }
-  
-  .zoom-controls {
-    justify-content: center;
-  }
-}
+
 
 .bracket-card-status {
   background: hsla(224, 50%, 20%, 0.6);
