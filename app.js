@@ -221,6 +221,24 @@ async function fetchMatches() {
   }
 }
 
+// Helper to determine the winner of a match (1 for team1, 2 for team2, null if draw/unfinished)
+function getWinnerOfMatch(match) {
+  if (!match || !match.score) return null;
+  if (match.score.p) {
+    if (match.score.p[0] > match.score.p[1]) return 1;
+    if (match.score.p[1] > match.score.p[0]) return 2;
+  }
+  if (match.score.et) {
+    if (match.score.et[0] > match.score.et[1]) return 1;
+    if (match.score.et[1] > match.score.et[0]) return 2;
+  }
+  if (match.score.ft) {
+    if (match.score.ft[0] > match.score.ft[1]) return 1;
+    if (match.score.ft[1] > match.score.ft[0]) return 2;
+  }
+  return null;
+}
+
 // Parse dates and times from worldcup.json structure
 function parseMatches(matchesList) {
   return matchesList.map(match => {
@@ -765,7 +783,35 @@ function renderMatchResults() {
       `;
     }
     
-    const htScoreHtml = match.score.ht ? `<span class="result-ht-score">HT: ${match.score.ht[0]} - ${match.score.ht[1]}</span>` : '';
+    const mainScore1 = match.score.et ? match.score.et[0] : match.score.ft[0];
+    const mainScore2 = match.score.et ? match.score.et[1] : match.score.ft[1];
+    
+    let subScoreHtml = '';
+    let badgeHtml = '';
+    const extraLines = [];
+    
+    if (match.score.ht) {
+      extraLines.push(`HT: ${match.score.ht[0]}-${match.score.ht[1]}`);
+    }
+    if (match.score.et) {
+      if (match.score.ft && (match.score.ft[0] !== match.score.et[0] || match.score.ft[1] !== match.score.et[1])) {
+        extraLines.push(`FT: ${match.score.ft[0]}-${match.score.ft[1]}`);
+      }
+      extraLines.push(`ET: ${match.score.et[0]}-${match.score.et[1]}`);
+    }
+    
+    if (match.score.p) {
+      badgeHtml = `<div class="result-penalty-badge"><i data-lucide="award" style="width:12px; height:12px;"></i>Pens: ${match.score.p[0]}-${match.score.p[1]}</div>`;
+    }
+    
+    if (extraLines.length > 0 || badgeHtml) {
+      subScoreHtml = `
+        <div class="result-details-block">
+          ${badgeHtml}
+          ${extraLines.length > 0 ? `<div class="result-extra-scores">${extraLines.map(line => `<div>${line}</div>`).join('')}</div>` : ''}
+        </div>
+      `;
+    }
     
     card.innerHTML = `
       <div class="result-card-header">
@@ -780,11 +826,11 @@ function renderMatchResults() {
         
         <div class="result-score-block">
           <div class="result-scores">
-            <span>${match.score.ft[0]}</span>
+            <span>${mainScore1}</span>
             <span class="score-dash">-</span>
-            <span>${match.score.ft[1]}</span>
+            <span>${mainScore2}</span>
           </div>
-          ${htScoreHtml}
+          ${subScoreHtml}
         </div>
         
         <div class="result-team team-2">
@@ -1349,11 +1395,10 @@ function resolveBracketTeams() {
         const sourceNum = winnerOfMatch[1];
         const sourceMatch = matchesData.find(m => m.num !== undefined && m.num.toString() === sourceNum);
         
-        if (sourceMatch && sourceMatch.score && sourceMatch.score.ft) {
-          const s1 = sourceMatch.score.ft[0];
-          const s2 = sourceMatch.score.ft[1];
-          if (s1 > s2) return { name: sourceMatch.team1, resolvedFrom: clean, isPlaceholder: false };
-          if (s2 > s1) return { name: sourceMatch.team2, resolvedFrom: clean, isPlaceholder: false };
+        if (sourceMatch && sourceMatch.score) {
+          const winnerIndex = getWinnerOfMatch(sourceMatch);
+          if (winnerIndex === 1) return { name: sourceMatch.team1, resolvedFrom: clean, isPlaceholder: false };
+          if (winnerIndex === 2) return { name: sourceMatch.team2, resolvedFrom: clean, isPlaceholder: false };
         }
         
         const sourceResolved = resolved[sourceNum];
@@ -1374,11 +1419,10 @@ function resolveBracketTeams() {
         const sourceNum = loserOfMatch[1];
         const sourceMatch = matchesData.find(m => m.num !== undefined && m.num.toString() === sourceNum);
         
-        if (sourceMatch && sourceMatch.score && sourceMatch.score.ft) {
-          const s1 = sourceMatch.score.ft[0];
-          const s2 = sourceMatch.score.ft[1];
-          if (s1 < s2) return { name: sourceMatch.team1, resolvedFrom: clean, isPlaceholder: false };
-          if (s2 < s1) return { name: sourceMatch.team2, resolvedFrom: clean, isPlaceholder: false };
+        if (sourceMatch && sourceMatch.score) {
+          const winnerIndex = getWinnerOfMatch(sourceMatch);
+          if (winnerIndex === 1) return { name: sourceMatch.team2, resolvedFrom: clean, isPlaceholder: false };
+          if (winnerIndex === 2) return { name: sourceMatch.team1, resolvedFrom: clean, isPlaceholder: false };
         }
         
         const sourceResolved = resolved[sourceNum];
@@ -1436,17 +1480,27 @@ function renderBracket() {
     let score2Html = '';
     
     if (hasFinished) {
-      const s1 = match.score.ft[0];
-      const s2 = match.score.ft[1];
-      score1Html = `<span class="bracket-team-score">${s1}</span>`;
-      score2Html = `<span class="bracket-team-score">${s2}</span>`;
-      statusHtml = `<span class="bracket-card-status">FT</span>`;
+      if (match.score.p) {
+        const scoreBase = match.score.et || match.score.ft;
+        score1Html = `<span class="bracket-team-score">${scoreBase[0]} <span class="bracket-penalty-score">(${match.score.p[0]})</span></span>`;
+        score2Html = `<span class="bracket-team-score">${scoreBase[1]} <span class="bracket-penalty-score">(${match.score.p[1]})</span></span>`;
+        statusHtml = `<span class="bracket-card-status">PEN</span>`;
+      } else if (match.score.et) {
+        score1Html = `<span class="bracket-team-score">${match.score.et[0]}</span>`;
+        score2Html = `<span class="bracket-team-score">${match.score.et[1]}</span>`;
+        statusHtml = `<span class="bracket-card-status">AET</span>`;
+      } else {
+        score1Html = `<span class="bracket-team-score">${match.score.ft[0]}</span>`;
+        score2Html = `<span class="bracket-team-score">${match.score.ft[1]}</span>`;
+        statusHtml = `<span class="bracket-card-status">FT</span>`;
+      }
     } else if (isLive) {
       statusHtml = `<span class="bracket-card-status live">LIVE</span>`;
     }
     
-    const t1WinnerClass = hasFinished && match.score.ft[0] > match.score.ft[1] ? 'winner' : '';
-    const t2WinnerClass = hasFinished && match.score.ft[1] > match.score.ft[0] ? 'winner' : '';
+    const winnerIndex = getWinnerOfMatch(match);
+    const t1WinnerClass = hasFinished && winnerIndex === 1 ? 'winner' : '';
+    const t2WinnerClass = hasFinished && winnerIndex === 2 ? 'winner' : '';
     
     const t1HintHtml = team1.hint ? `<span class="bracket-team-name font-small" style="font-size:0.75rem; color:var(--text-muted);" title="${team1.hint}">(${team1.hint})</span>` : '';
     const t2HintHtml = team2.hint ? `<span class="bracket-team-name font-small" style="font-size:0.75rem; color:var(--text-muted);" title="${team2.hint}">(${team2.hint})</span>` : '';
