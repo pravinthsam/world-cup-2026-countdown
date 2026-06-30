@@ -799,6 +799,7 @@ body {
   display: flex;
   align-items: center;
   gap: 1.25rem;
+  transition: var(--transition-smooth);
 }
 
 .result-team.team-1 {
@@ -814,11 +815,17 @@ body {
 .result-team .team-name {
   font-family: var(--font-heading);
   font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--text-white);
+  font-weight: 500;
+  color: var(--text-gray);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: var(--transition-smooth);
+}
+
+.result-team.winner .team-name {
+  color: var(--text-white);
+  font-weight: 700;
 }
 
 .result-score-block {
@@ -840,8 +847,16 @@ body {
   font-family: var(--font-heading);
   font-size: 1.8rem;
   font-weight: 800;
-  color: var(--accent-gold);
-  text-shadow: 0 0 10px var(--accent-gold-glow);
+}
+
+.result-scores span:not(.score-dash) {
+  color: var(--text-gray);
+  transition: var(--transition-smooth);
+}
+
+.result-scores span.winner {
+  color: var(--accent-green);
+  text-shadow: 0 0 10px var(--accent-green-glow);
 }
 
 .result-scores .score-dash {

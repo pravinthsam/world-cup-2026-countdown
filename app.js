@@ -813,27 +813,31 @@ function renderMatchResults() {
       `;
     }
     
+    const winnerIndex = getWinnerOfMatch(match);
+    const t1WinnerClass = winnerIndex === 1 ? 'winner' : '';
+    const t2WinnerClass = winnerIndex === 2 ? 'winner' : '';
+    
     card.innerHTML = `
       <div class="result-card-header">
         <span class="round">${match.round}</span>
         <span class="group">${match.group || 'Knockout Stage'}</span>
       </div>
       <div class="result-match-body">
-        <div class="result-team team-1">
+        <div class="result-team team-1 ${t1WinnerClass}">
           <span class="team-name" title="${formattedTeam1}">${formattedTeam1}</span>
           ${team1FlagHtml}
         </div>
         
         <div class="result-score-block">
           <div class="result-scores">
-            <span>${mainScore1}</span>
+            <span class="${t1WinnerClass}">${mainScore1}</span>
             <span class="score-dash">-</span>
-            <span>${mainScore2}</span>
+            <span class="${t2WinnerClass}">${mainScore2}</span>
           </div>
           ${subScoreHtml}
         </div>
         
-        <div class="result-team team-2">
+        <div class="result-team team-2 ${t2WinnerClass}">
           ${team2FlagHtml}
           <span class="team-name" title="${formattedTeam2}">${formattedTeam2}</span>
         </div>
