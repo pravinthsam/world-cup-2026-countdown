@@ -1455,6 +1455,17 @@ function resolveBracketTeams() {
   return resolved;
 }
 
+// Helper to check if a round is completely finished
+function isRoundComplete(colSpec) {
+  const matchNums = colSpec.type === 'pairs' ? colSpec.matches.flat() : colSpec.matches;
+  if (!matchNums || matchNums.length === 0) return false;
+  
+  return matchNums.every(num => {
+    const match = matchesData.find(m => m.num !== undefined && m.num.toString() === num.toString());
+    return match && match.score && match.score.ft;
+  });
+}
+
 // Render dynamic bracket layout
 function renderBracket() {
   const container = document.getElementById('bracket-tree-container');
@@ -1638,6 +1649,12 @@ function renderBracket() {
     if (colSpec.isFirstRound) col.classList.add('first-round');
     if (colSpec.isLastRound) col.classList.add('last-round');
     
+    // Default collapse the round if it's collapsible and all matches are finished
+    const isCollapsible = colSpec.roundName === 'R32' || colSpec.roundName === 'R16';
+    if (isCollapsible && isRoundComplete(colSpec)) {
+      col.classList.add('collapsed');
+    }
+    
     // Header
     let subtitle = '';
     if (colSpec.type === 'pairs') {
@@ -1647,7 +1664,31 @@ function renderBracket() {
     } else {
       subtitle = `Champions & 3rd Place`;
     }
-    col.innerHTML = `<div class="bracket-round-header"><h3>${colSpec.name} <span class="bracket-round-subtitle">(${subtitle})</span></h3></div>`;
+    
+    if (isCollapsible) {
+      const isLeft = colSpec.side === 'left';
+      col.innerHTML = `
+        <div class="bracket-round-header">
+          <div class="header-expanded-content">
+            <h3>
+              ${colSpec.name}
+              <span class="bracket-round-subtitle">(${subtitle})</span>
+            </h3>
+            <button class="collapse-toggle-btn" title="Collapse Column">
+              <i data-lucide="${isLeft ? 'chevron-left' : 'chevron-right'}"></i>
+            </button>
+          </div>
+          <div class="header-collapsed-content">
+            <button class="collapse-toggle-btn" title="Expand Column">
+              <i data-lucide="${isLeft ? 'chevron-right' : 'chevron-left'}"></i>
+            </button>
+            <div class="vertical-title">${colSpec.name}</div>
+          </div>
+        </div>
+      `;
+    } else {
+      col.innerHTML = `<div class="bracket-round-header"><h3>${colSpec.name} <span class="bracket-round-subtitle">(${subtitle})</span></h3></div>`;
+    }
     
     // Matches
     if (colSpec.type === 'pairs') {
@@ -1702,6 +1743,17 @@ function renderBracket() {
     }
     
     container.appendChild(col);
+  });
+  
+  // Wire up collapse toggle buttons
+  container.querySelectorAll('.collapse-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const roundCol = btn.closest('.bracket-round');
+      if (roundCol) {
+        roundCol.classList.toggle('collapsed');
+      }
+    });
   });
   
   lucide.createIcons();

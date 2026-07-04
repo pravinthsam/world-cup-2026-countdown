@@ -1628,6 +1628,7 @@ body {
   flex-shrink: 0;
   gap: 1.25rem;
   position: relative;
+  transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), padding 0.3s ease, gap 0.3s ease;
 }
 
 .bracket-round-header {
@@ -2069,4 +2070,128 @@ body {
 
 .retry-button:active i, .retry-button:active svg {
   transform: rotate(180deg);
+}
+
+/* Collapsible Bracket Columns */
+.bracket-round.collapsed {
+  width: 50px;
+  gap: 0;
+  padding-left: 0;
+  padding-right: 0;
+  overflow: hidden;
+}
+
+.bracket-round.collapsed .bracket-match-pair {
+  display: none !important;
+}
+
+.bracket-round.collapsed .bracket-round-header {
+  padding: 0;
+  border-bottom: none;
+}
+
+/* Header Contents Toggling */
+.header-expanded-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.header-collapsed-content {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 0;
+  width: 100%;
+}
+
+.bracket-round.collapsed .header-expanded-content {
+  display: none;
+}
+
+.bracket-round.collapsed .header-collapsed-content {
+  display: flex;
+}
+
+/* Collapse / Expand Toggle Buttons */
+.collapse-toggle-btn {
+  background: hsla(224, 71%, 15%, 0.6);
+  border: 1px solid var(--border-color);
+  color: var(--text-light);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  flex-shrink: 0;
+}
+
+.collapse-toggle-btn:hover {
+  background: var(--accent-gold);
+  color: var(--theme-bg-dark, #020617);
+  border-color: var(--accent-gold);
+  transform: scale(1.1);
+}
+
+.header-collapsed-content .collapse-toggle-btn {
+  width: 32px;
+  height: 32px;
+}
+
+/* Vertical Title in Collapsed State */
+.vertical-title {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  font-size: 0.75rem;
+  background: linear-gradient(180deg, var(--accent-gold), var(--text-white));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  white-space: nowrap;
+  margin-top: 0.5rem;
+}
+
+/* Connection Lines Adjustment When Collapsed */
+.bracket-round.collapsed .bracket-match::after,
+.bracket-round.collapsed .bracket-match-pair::after {
+  display: none !important;
+}
+
+/* Hide incoming connector lines for Round of 16 when Round of 32 is collapsed */
+.bracket-tree:has([data-round-id="left-r32"].collapsed) [data-round-id="left-r16"] .bracket-match::before {
+  display: none !important;
+}
+
+.bracket-tree:has([data-round-id="right-r32"].collapsed) [data-round-id="right-r16"] .bracket-match::before {
+  display: none !important;
+}
+
+/* Hide incoming connector lines for Quarter-finals when Round of 16 is collapsed */
+.bracket-tree:has([data-round-id="left-r16"].collapsed) [data-round-id="left-qf"] .bracket-match::before {
+  display: none !important;
+}
+
+.bracket-tree:has([data-round-id="right-r16"].collapsed) [data-round-id="right-qf"] .bracket-match::before {
+  display: none !important;
+}
+
+/* Hide outgoing connector lines of Round of 32 when Round of 16 is collapsed */
+.bracket-tree:has([data-round-id="left-r16"].collapsed) [data-round-id="left-r32"] .bracket-match::after,
+.bracket-tree:has([data-round-id="left-r16"].collapsed) [data-round-id="left-r32"] .bracket-match-pair::after {
+  display: none !important;
+}
+
+.bracket-tree:has([data-round-id="right-r16"].collapsed) [data-round-id="right-r32"] .bracket-match::after,
+.bracket-tree:has([data-round-id="right-r16"].collapsed) [data-round-id="right-r32"] .bracket-match-pair::after {
+  display: none !important;
 }
