@@ -9,3 +9,6 @@ Thumbs.db
 
 # Agent settings & rules
 .agents/
+
+# Puppeteer / browser binaries downloaded by tooling
+chrome/
