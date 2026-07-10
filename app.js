@@ -1721,15 +1721,18 @@ function renderBracket() {
         col.appendChild(pairContainer);
       });
     } else if (colSpec.type === 'center') {
-      const pairContainer = document.createElement('div');
-      pairContainer.className = 'bracket-match-pair';
+      // Final match — use a simple wrapper (not bracket-match-pair with height:100%)
+      // so it sits in normal flow and aligns naturally with the SF columns
+      const finalSection = document.createElement('div');
+      finalSection.className = 'center-final-wrapper';
       
       const finalWrapper = document.createElement('div');
       finalWrapper.className = 'bracket-match';
       finalWrapper.innerHTML = createMatchCardHtml(colSpec.matches[0], 'Final');
-      pairContainer.appendChild(finalWrapper);
-      col.appendChild(pairContainer);
+      finalSection.appendChild(finalWrapper);
+      col.appendChild(finalSection);
       
+      // Third Place Playoff — flows below Final in normal document flow
       const thirdPlacePlayoff = document.createElement('div');
       thirdPlacePlayoff.className = 'third-place-container';
       thirdPlacePlayoff.innerHTML = `<div class="third-place-title">Third Place Playoff</div>`;

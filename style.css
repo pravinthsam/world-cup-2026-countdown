@@ -1631,6 +1631,21 @@ body {
   transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), padding 0.3s ease, gap 0.3s ease;
 }
 
+/* Center (Finals) column: stack Final + Third Place naturally */
+.bracket-round.center-side {
+  justify-content: center;
+  align-items: stretch;
+  gap: 0;
+  width: 220px;
+}
+
+/* Wrapper for the Grand Final card — simple block, no height:100% fighting layout */
+.center-final-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 0.25rem 0;
+}
 .bracket-round-header {
   text-align: center;
   margin-bottom: 0.4rem;
@@ -1988,14 +2003,10 @@ body {
 }
 
 .center-side .third-place-container {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin-top: 0;
+  position: static;
+  margin-top: 2rem;
   border-top: 1px dashed var(--border-color);
-  padding-top: 0.5rem;
-  z-index: 10;
+  padding-top: 1rem;
 }
 
 .third-place-container .bracket-match {
